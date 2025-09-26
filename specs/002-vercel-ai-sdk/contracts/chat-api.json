@@ -1,0 +1,152 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AI Chat API",
+    "description": "API for streaming AI chat responses using Vercel AI SDK",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/chat": {
+      "post": {
+        "summary": "Send chat message and receive streaming AI response",
+        "description": "Accepts a chat message and returns a streaming response from the configured AI provider",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Streaming AI response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Server-sent events stream with AI response chunks"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body or missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid AI provider API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded from AI provider",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error or AI provider unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChatRequest": {
+        "type": "object",
+        "required": ["messages"],
+        "properties": {
+          "messages": {
+            "type": "array",
+            "description": "Array of chat messages in the conversation",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "minItems": 1
+          },
+          "provider": {
+            "type": "string",
+            "description": "AI provider to use",
+            "enum": ["openai", "anthropic", "google"],
+            "default": "openai"
+          },
+          "model": {
+            "type": "string",
+            "description": "Specific model to use (provider-dependent)",
+            "examples": ["gpt-4", "claude-3-sonnet", "gemini-pro"]
+          }
+        }
+      },
+      "ChatMessage": {
+        "type": "object",
+        "required": ["id", "role", "content"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the message"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["user", "assistant", "system"],
+            "description": "Role of the message sender"
+          },
+          "content": {
+            "type": "string",
+            "description": "Text content of the message",
+            "minLength": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO timestamp when message was created"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error", "message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error type identifier"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error description"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional error context",
+            "additionalProperties": true
+          }
+        }
+      }
+    }
+  }
+}
