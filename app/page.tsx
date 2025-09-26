@@ -1,14 +1,24 @@
 import { Button } from "@/components/retroui/Button";
+import ImageGenerator from "@/components/ImageGenerator";
 
 export default function Home() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start max-w-2xl">
         <div className="text-center sm:text-left">
-          <h1 className="text-4xl font-bold mb-4">RetroUI Demo</h1>
+          <h1 className="text-4xl font-bold mb-4">RetroUI + AI Demo</h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-            A demonstration of RetroUI components installed in Next.js
+            RetroUI components with AI-powered image generation using Google Gemini 2.5 Flash
           </p>
+        </div>
+
+        {/* AI Image Generator Section */}
+        <div className="w-full p-6 border border-gray-200 dark:border-gray-800 rounded-lg">
+          <h2 className="text-xl font-semibold mb-4">🎨 AI Image Generator</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+            Generate AI images using Google Gemini 2.5 Flash Image Preview model with RetroUI styling.
+          </p>
+          <ImageGenerator data-testid="image-generator" />
         </div>
 
         <div className="grid grid-cols-1 gap-6 w-full">
@@ -47,6 +57,14 @@ export default function Home() {
                 <span className="text-green-500">✓</span>
                 <span>Button component added</span>
               </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✓</span>
+                <span>Google AI SDK integrated</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✓</span>
+                <span>AI image generation ready</span>
+              </div>
             </div>
           </div>
         </div>
@@ -74,7 +92,7 @@ export default function Home() {
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <p className="text-sm text-gray-500">
-          RetroUI successfully installed and ready to use!
+          RetroUI + Google AI integration successfully installed and ready to use!
         </p>
       </footer>
     </div>
