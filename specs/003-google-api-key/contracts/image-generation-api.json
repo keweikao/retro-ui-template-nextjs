@@ -1,0 +1,191 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Google AI Image Generation API",
+    "description": "API for generating images using Google's Gemini 2.5 Flash Image Preview model",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/generate-image": {
+      "post": {
+        "summary": "Generate AI image from text prompt",
+        "description": "Accepts a text prompt and generates an image using Google's Gemini 2.5 Flash Image Preview model",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImageGenerationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageGenerationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body or prompt validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Google AI API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded from Google AI API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error or Google AI API unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ImageGenerationRequest": {
+        "type": "object",
+        "required": ["prompt"],
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "Text description for image generation",
+            "minLength": 1,
+            "maxLength": 1000,
+            "example": "A futuristic city with flying cars at sunset"
+          },
+          "model": {
+            "type": "string",
+            "description": "Google AI model to use for generation",
+            "enum": ["gemini-2.5-flash-image-preview"],
+            "default": "gemini-2.5-flash-image-preview"
+          }
+        }
+      },
+      "ImageGenerationResponse": {
+        "type": "object",
+        "required": ["success", "requestId", "generatedAt"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether image generation was successful",
+            "example": true
+          },
+          "requestId": {
+            "type": "string",
+            "description": "Unique identifier for this generation request",
+            "format": "uuid"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL or base64 data of the generated image",
+            "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO timestamp when image was generated"
+          },
+          "dimensions": {
+            "type": "object",
+            "description": "Generated image dimensions",
+            "properties": {
+              "width": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 1024
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 1024
+              }
+            },
+            "required": ["width", "height"]
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Original prompt used for generation"
+          },
+          "model": {
+            "type": "string",
+            "description": "AI model used for generation"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["success", "error", "message"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [false],
+            "description": "Always false for error responses"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error type identifier",
+            "enum": [
+              "INVALID_PROMPT",
+              "API_KEY_MISSING",
+              "API_KEY_INVALID",
+              "RATE_LIMIT_EXCEEDED",
+              "MODEL_UNAVAILABLE",
+              "GENERATION_FAILED",
+              "INTERNAL_ERROR"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error description",
+            "example": "The provided prompt is too short. Please provide a more detailed description."
+          },
+          "requestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Request ID for error tracking"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional error context",
+            "additionalProperties": true
+          }
+        }
+      }
+    }
+  }
+}
